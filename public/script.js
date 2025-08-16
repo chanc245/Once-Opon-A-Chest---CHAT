@@ -98,11 +98,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- AVATAR LABELS & PERSONAS ----------
   const NAME_BY_INDEX = [
-    "Ballerina",
-    "Acrobat",
-    "Pirates",
-    "Traveler",
-    "Apprentice",
+    "---------- Ballerina ----------",
+    "---------- Acrobat ----------",
+    "---------- Pirates ----------",
+    "---------- Traveler ----------",
+    "---------- Apprentice ----------",
   ];
 
   // Your updated persona instructions (include the “you already ask the question of: …” part)
