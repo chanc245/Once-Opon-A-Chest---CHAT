@@ -39,6 +39,8 @@
   /* Char 5 */
   --char5-red-light: #f3cdc0;
   --char5-red-dark: #c66363;
+
+  --chat-vpad: clamp(12px, 2.5vh, 24px);
 }
 
 /* Reset-ish */
@@ -55,6 +57,9 @@ body {
     Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   background: var(--bg);
   color: var(--text);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 /* Character name */
@@ -73,10 +78,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100%;
 }
 
 /* Avatar header */
 .app-header.avatars {
+  min-height: 70px; /* enforce min height */
   height: 10vh;
   padding: 8px;
   box-sizing: border-box;
@@ -106,13 +113,15 @@ body {
   outline-offset: 2px;
 }
 
-/* Chat area (content not clipped; SVG mask applied to bg layer) */
+/* Chat area */
 .chat {
   position: relative;
-  height: 90vh;
+  flex: 1 1 auto;
+  min-height: 0; /* critical for flex scroll */
   width: 100%;
-  padding: clamp(12px, 2.5vh, 24px);
-  overflow: hidden;
+  padding: var(--chat-vpad);
+  padding-bottom: max(var(--chat-vpad), env(safe-area-inset-bottom));
+  overflow: hidden; /* keep bg layer tidy */
   display: flex;
   flex-direction: column;
 }
@@ -132,29 +141,34 @@ body {
 
   -webkit-mask-image: url("assets/ui_chatBG.svg");
   -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  -webkit-mask-size: contain;
+  -webkit-mask-position: top center;
+  -webkit-mask-size: 100% auto;
 
   mask-image: url("assets/ui_chatBG.svg");
   mask-repeat: no-repeat;
-  mask-position: center;
-  mask-size: contain;
+  mask-position: top center;
+  mask-size: 100% auto;
 
   transition: background-color 180ms ease;
 }
 /* Desktop / large screens: let mask flex to fill */
 @media (min-width: 992px) and (orientation: landscape) {
   .chat::before {
-    -webkit-mask-size: cover;
-    mask-size: cover;
+    -webkit-mask-size: 100% auto;
+    mask-size: 100% auto;
   }
 }
 
 /* Messages list */
-.messages {
-  flex: 1;
+#messages.messages {
+  flex: 1 1 auto;
+  min-height: 0; /* critical */
+  max-height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 8px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Bubbles */
@@ -192,23 +206,15 @@ body {
   max-width: 100%;
 }
 
-/* Optional: themed typing bubble (use .typing class from JS) */
-.msg.system.typing {
-  background: color-mix(in srgb, var(--chatbox-color) 70%, transparent);
-  color: var(--visitor-gray-dark);
-  padding: 8px 10px;
-  border-radius: 10px;
-}
-
 /* Composer (chat form) */
 form#chatForm.composer {
+  flex: 0 0 auto;
   display: flex;
   gap: 8px;
   padding: 12px;
   border-top: 1px solid var(--border);
   border-radius: 10px;
 
-  /* 50% of current AI bubble bg (with fallback) */
   background: var(--ai-bubble-bg);
   background: color-mix(in srgb, var(--ai-bubble-bg) 50%, transparent);
 }
@@ -225,9 +231,6 @@ input#chatInput.input {
 }
 input#chatInput.input::placeholder {
   color: rgba(100, 100, 100, 0.7);
-}
-input#chatInput.input:focus {
-  outline: 2px solid var(--accent);
 }
 
 /* Send button */
@@ -246,14 +249,14 @@ form#chatForm .send:disabled {
 }
 
 /* Scrollbar */
-.messages::-webkit-scrollbar {
+#messages.messages::-webkit-scrollbar {
   width: 10px;
 }
-.messages::-webkit-scrollbar-thumb {
+#messages.messages::-webkit-scrollbar-thumb {
   background: #2b2f36;
   border-radius: 6px;
 }
-.messages::-webkit-scrollbar-track {
+#messages.messages::-webkit-scrollbar-track {
   background: transparent;
 }
 
