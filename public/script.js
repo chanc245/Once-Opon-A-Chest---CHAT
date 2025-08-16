@@ -1,80 +1,90 @@
-// ---------- TERMINAL ---------- //
-// ---------- TERMINAL ---------- //
-// ---------- TERMINAL ---------- //
-// ---------- TERMINAL ---------- //
-// ---------- TERMINAL ---------- //
+// ---------- SIMPLE WEB CHAT (no terminal) ----------
 
-// github('jcubic/jquery.terminal');
-document.fonts.ready.then(() => {
-  const term = $("#commandDiv").terminal(
-    {
-      start: async function () {
-        // loadPuzzle.call(this);
-      },
-      processInput: async function (input) {
-        const prompt = evaluationPrompt(otherInput, input);
+// ---------- INTRO SCREEN ----------
+const introEl = document.getElementById("intro");
+const chatAppEl = document.getElementById("chatApp");
 
-        const aiResponse = await fetchAIResponse(prompt);
-
-        this.echo(`\n[AI]
-  ${aiResponse}
-`);
-      },
-    },
-    {
-      greetings: `Welcome to AI Chatbot example in jquery.terminal!
-
-See /public/prompt.js to update the prompt you’re using. Otherwise, the AI will answer questions based on the current prompt!
-`,
-      prompt: "> ",
-      onInit: function () {
-        this.push(async function (input) {
-          const prompt = evaluationPrompt(otherInput, input);
-          const aiResponse = await fetchAIResponse(prompt);
-          this.echo(`\n[AI]
-  ${aiResponse}
-`);
-        });
-      },
-    }
-  );
+introEl.addEventListener("click", () => {
+  introEl.classList.add("hidden");
+  chatAppEl.classList.remove("hidden");
 });
 
-// ---------- AI ---------- //
-// ---------- AI ---------- //
-// ---------- AI ---------- //
-// ---------- AI ---------- //
-// ---------- AI ---------- //
-
+// --- AI fetcher (kept your endpoint contract)
 async function fetchAIResponse(input) {
-  console.log(`--fetchAIResponse started --input: ${input}`);
-
   try {
     const response = await fetch("/submit", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ input }),
     });
 
-    if (response.ok) {
-      console.log("--AI response OK");
-      const jsonData = await response.json();
-      const aiModResponse = jsonData.ai;
-
-      console.log(`==Gemini Output: ${aiModResponse}`);
-      return aiModResponse;
-    } else {
+    if (!response.ok) {
       console.error(
         "Error in API request:",
         response.status,
         response.statusText
       );
-      return `Error in API request: ${response.status} ${response.statusText}`;
+      return `Error: ${response.status} ${response.statusText}`;
     }
+
+    const data = await response.json();
+    const text = (data?.ai ?? "").trim();
+    return text.length ? text : "(Empty AI response)";
   } catch (error) {
     console.error("Error fetching AI response:", error);
     return "Oops, something went wrong. Let's try again!";
   }
 }
+
+// --- Minimal UI helpers
+const messagesEl = document.getElementById("messages");
+const formEl = document.getElementById("chatForm");
+const inputEl = document.getElementById("chatInput");
+
+function addMessage(text, role = "ai") {
+  const div = document.createElement("div");
+  div.className = `msg ${role}`;
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function addSystemNote(text) {
+  const div = document.createElement("div");
+  div.className = "msg system";
+  div.textContent = text;
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+// --- Submit handler
+formEl.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const userText = inputEl.value.trim();
+  if (!userText) return;
+
+  // show user bubble
+  addMessage(userText, "user");
+  inputEl.value = "";
+  inputEl.focus();
+
+  // build your prompt: you can change evaluationPrompt() as you like
+  const prompt = evaluationPrompt(otherInput, userText);
+
+  // show typing…
+  const typingNote = document.createElement("div");
+  typingNote.className = "msg system";
+  typingNote.textContent = "Thinking…";
+  messagesEl.appendChild(typingNote);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  // get AI
+  const aiText = await fetchAIResponse(prompt);
+
+  // remove typing note & show AI bubble
+  typingNote.remove();
+  addMessage(aiText, "ai");
+});
+
+// Optional: initial hint
+addSystemNote("The visitor has enter the chat!");

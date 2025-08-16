@@ -3,23 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.jsdelivr.net/npm/jquery"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery.terminal/js/jquery.terminal.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/jquery.terminal/css/jquery.terminal.min.css"
-    />
     <link rel="stylesheet" href="style.css" />
-
-    <title>AI Chatbot in jquery.terminal</title>
+    <title>AI Chatbot (Web)</title>
   </head>
 
   <body>
-    <div class="container">
-      <div class="flex-container">
-        <div class="preloader visually-hidden"></div>
-        <div class="inter box-right" id="commandDiv"></div>
-      </div>
+    <!-- Intro screen -->
+    <div id="intro" class="intro-screen">
+      <img src="assets/intro_ticket.svg" alt="Intro Ticket" class="intro-img" />
+      <!-- <p class="intro-note">Click anywhere to continue</p> -->
+    </div>
+
+    <!-- Chat container (hidden at first) -->
+    <div id="chatApp" class="container hidden">
+      <header class="app-header avatars">
+        <img src="assets/avatar_char1.png" alt="Avatar 1" class="avatar" />
+        <img src="assets/avatar_char2.png" alt="Avatar 2" class="avatar" />
+        <img src="assets/avatar_char3.png" alt="Avatar 3" class="avatar" />
+        <img src="assets/avatar_char4.png" alt="Avatar 4" class="avatar" />
+        <img src="assets/avatar_char5.png" alt="Avatar 5" class="avatar" />
+      </header>
+
+      <main class="chat">
+        <p id="char_name">---------- Character Name ----------</p>
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <form id="chatForm" class="composer">
+          <input
+            id="chatInput"
+            class="input"
+            type="text"
+            placeholder="Type a message…"
+            autocomplete="off"
+            required
+          />
+          <button class="send" type="submit">Send</button>
+        </form>
+      </main>
     </div>
 
     <script src="prompt.js"></script>
