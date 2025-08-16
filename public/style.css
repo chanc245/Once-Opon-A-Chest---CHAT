@@ -1,20 +1,20 @@
 /* Root palette */
 :root {
-  --bg: #111214;
-  --panel: #1b1d22;
-  --card: #22252b;
+  --bg: #ececec;
+  --panel: #ffffff;
+  --card: rgb(204, 204, 204);
   --text: #e7e7e7;
   --muted: #a6aab3;
   --accent: #6da7ff;
   --accent-2: #4ddc8b;
-  --border: #2e333a;
+  --border: #ffffff;
 
   /* AI bubble dynamic colors (updated via JS) */
   --ai-bubble-bg: var(--card);
   --ai-bubble-text: var(--text);
 
-  /* Chatbox fill color */
-  --chatbox-color: #1b1d22;
+  /* Chatbox fill color (drives masked bg) */
+  --chatbox-color: #ffffff;
 
   /* Visitor */
   --visitor-gray-light: #f8f2f2;
@@ -63,13 +63,13 @@ body {
   text-align: center;
   font-weight: bold;
   color: var(--char-name-color, var(--text));
+  transition: color 180ms ease;
 }
 
 /* Layout */
 .container {
   max-width: 780px;
   margin: 0 auto;
-  /* padding: 16px; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -84,10 +84,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  /* border-bottom: 1px solid var(--border); */
-  /* margin-bottom: 16px; */
 }
-
 .avatar {
   height: 100%;
   aspect-ratio: 1 / 1;
@@ -95,13 +92,11 @@ body {
   object-fit: contain;
   display: block;
 }
-
 @media (max-width: 480px) {
   .avatar {
     height: 90%;
   }
 }
-
 /* Make avatars clickable & focus-visible */
 .avatar.is-clickable {
   cursor: pointer;
@@ -111,17 +106,29 @@ body {
   outline-offset: 2px;
 }
 
-/* Chat area */
+/* Chat area (content not clipped; SVG mask applied to bg layer) */
 .chat {
   position: relative;
   height: 90vh;
   width: 100%;
-  padding: 20px;
+  padding: clamp(12px, 2.5vh, 24px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+.chat > * {
+  position: relative;
+  z-index: 1;
+}
 
+/* Masked background layer */
+.chat::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background-color: var(--chatbox-color);
+  z-index: 0;
+  pointer-events: none;
 
   -webkit-mask-image: url("assets/ui_chatBG.svg");
   -webkit-mask-repeat: no-repeat;
@@ -132,8 +139,18 @@ body {
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
+
+  transition: background-color 180ms ease;
+}
+/* Desktop / large screens: let mask flex to fill */
+@media (min-width: 992px) and (orientation: landscape) {
+  .chat::before {
+    -webkit-mask-size: cover;
+    mask-size: cover;
+  }
 }
 
+/* Messages list */
 .messages {
   flex: 1;
   overflow-y: auto;
@@ -150,71 +167,72 @@ body {
   word-wrap: break-word;
   white-space: pre-wrap;
 }
-
 .msg.user {
-  background: var(--visitor-gray-light); /* bubble background */
-  color: var(--visitor-gray-dark); /* text color */
+  background: var(--visitor-gray-light);
+  color: var(--visitor-gray-dark);
   margin-left: auto;
   border-bottom-right-radius: 4px;
 }
-
 .msg.ai {
   background: var(--ai-bubble-bg);
   color: var(--ai-bubble-text);
   margin-right: auto;
   border-bottom-left-radius: 4px;
-  /* Optional: remove border since we’re tinting the bubble */
   border: none;
+  transition: background-color 180ms ease, color 180ms ease;
 }
-
 .msg.system {
   background: transparent;
   color: var(--muted);
   font-size: 13px;
   text-align: center;
-
-  /* center horizontally */
   margin-left: auto;
   margin-right: auto;
-
-  /* fit to content but don't overflow */
   width: fit-content;
   max-width: 100%;
 }
 
-/* Composer (sits inside chat shape) */
-.composer {
+/* Composer (chat form) */
+form#chatForm.composer {
   display: flex;
   gap: 8px;
   padding: 12px;
   border-top: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.2);
   border-radius: 10px;
+
+  /* 50% of current AI bubble bg (with fallback) */
+  background: var(--ai-bubble-bg);
+  background: color-mix(in srgb, var(--ai-bubble-bg) 50%, transparent);
 }
 
-.input {
+/* Input box (borderless) */
+input#chatInput.input {
   flex: 1;
-  border: 1px solid var(--border);
-  background: #15171a;
-  color: var(--text);
+  border: none;
+  background: var(--chatbox-color);
+  color: rgba(100, 100, 100);
   border-radius: 10px;
   padding: 12px 14px;
   outline: none;
 }
-.input:focus {
-  border-color: var(--accent);
+input#chatInput.input::placeholder {
+  color: rgba(100, 100, 100, 0.7);
+}
+input#chatInput.input:focus {
+  outline: 2px solid var(--accent);
 }
 
-.send {
+/* Send button */
+form#chatForm .send {
   border: none;
-  background: var(--accent);
-  color: #051326;
+  background: var(--visitor-gray-dark);
+  color: var(--visitor-gray-light);
   padding: 0 16px;
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
 }
-.send:disabled {
+form#chatForm .send:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -241,11 +259,11 @@ body {
   justify-content: center;
   align-items: center;
 
-  z-index: 99999; /* ensure it’s above everything */
+  z-index: 99999;
   cursor: pointer;
-  pointer-events: auto; /* accept clicks/taps */
+  pointer-events: auto;
 }
-/* make sure children can receive events too */
+/* allow children to receive events */
 .intro-screen * {
   pointer-events: auto;
 }
