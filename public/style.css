@@ -9,6 +9,10 @@
   --accent-2: #4ddc8b;
   --border: #2e333a;
 
+  /* AI bubble dynamic colors (updated via JS) */
+  --ai-bubble-bg: var(--card);
+  --ai-bubble-text: var(--text);
+
   /* Chatbox fill color */
   --chatbox-color: #1b1d22;
 
@@ -53,11 +57,12 @@ body {
   color: var(--text);
 }
 
+/* Character name */
 #char_name {
   margin: 0 0 12px;
   text-align: center;
   font-weight: bold;
-  color: var(--text);
+  color: var(--char-name-color, var(--text));
 }
 
 /* Layout */
@@ -97,25 +102,36 @@ body {
   }
 }
 
+/* Make avatars clickable & focus-visible */
+.avatar.is-clickable {
+  cursor: pointer;
+}
+.avatar.is-clickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* Chat area */
 .chat {
   position: relative;
-  height: 90vh; /* always 90% of the screen height */
+  height: 90vh;
   width: 100%;
   padding: 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 
-  /* SVG background */
-  background-image: url("assets/ui_chatBG.svg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-
-  /* overlay color (adjustable) */
   background-color: var(--chatbox-color);
-  background-blend-mode: multiply; /* or overlay / screen depending on look */
+
+  -webkit-mask-image: url("assets/ui_chatBG.svg");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+
+  mask-image: url("assets/ui_chatBG.svg");
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
 }
 
 .messages {
@@ -136,18 +152,19 @@ body {
 }
 
 .msg.user {
-  background: var(--accent);
-  color: #06192f;
+  background: var(--visitor-gray-light); /* bubble background */
+  color: var(--visitor-gray-dark); /* text color */
   margin-left: auto;
   border-bottom-right-radius: 4px;
 }
 
 .msg.ai {
-  background: var(--card);
-  border: 1px solid var(--border);
-  color: var(--text);
+  background: var(--ai-bubble-bg);
+  color: var(--ai-bubble-text);
   margin-right: auto;
   border-bottom-left-radius: 4px;
+  /* Optional: remove border since we’re tinting the bubble */
+  border: none;
 }
 
 .msg.system {
@@ -160,7 +177,7 @@ body {
   margin-left: auto;
   margin-right: auto;
 
-  /* let it use full width (instead of the 85% from .msg) */
+  /* fit to content but don't overflow */
   width: fit-content;
   max-width: 100%;
 }
@@ -184,7 +201,6 @@ body {
   padding: 12px 14px;
   outline: none;
 }
-
 .input:focus {
   border-color: var(--accent);
 }
@@ -198,7 +214,6 @@ body {
   font-weight: 600;
   cursor: pointer;
 }
-
 .send:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -225,10 +240,17 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+
+  z-index: 99999; /* ensure it’s above everything */
   cursor: pointer;
+  pointer-events: auto; /* accept clicks/taps */
+}
+/* make sure children can receive events too */
+.intro-screen * {
+  pointer-events: auto;
 }
 
+/* Desktop / landscape ticket sizing */
 .intro-img {
   height: 100svh;
   height: 100vh;
@@ -236,7 +258,7 @@ body {
   max-width: none;
   display: block;
 }
-
+/* Mobile / portrait ticket sizing */
 @media (orientation: portrait) {
   .intro-img {
     width: 100vw;
