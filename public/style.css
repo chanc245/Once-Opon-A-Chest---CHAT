@@ -1,0 +1,112 @@
+/* DEBUGGING */
+/* *{
+  box-sizing: border-box;
+  border: 0.1px chartreuse solid;
+} */
+
+/* root variable for changing the overall color */
+:root {
+  --term-bg: #272727;
+  --term-border: #9e9e9e9e;
+  --term-text: #c8c8c8;
+  --term-prompt: #647fd7;
+  --web-page-bg: #333333;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background-color: var(--web-page-bg);
+}
+
+#main {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.inter {
+  border: 5px solid var(--term-border);
+}
+
+#commandDiv {
+  overflow-x: auto;
+  overflow-y: auto;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  background-color: var(--term-bg);
+}
+
+:root {
+  --size: 1.4;
+}
+
+.terminal {
+  --color: var(--term-text);
+}
+
+.cmd,
+.cmd-prompt {
+  --color: var(--term-prompt);
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  margin: 50px;
+}
+
+.flex-container {
+  z-index: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  height: 80vh;
+  width: 70%;
+  margin: auto;
+  gap: 30px;
+}
+
+.box-cont {
+  width: 70%;
+}
+
+.box-right {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    margin: 10px;
+    height: 100vh;
+  }
+
+  .flex-container {
+    flex-direction: column;
+    width: 100%;
+    height: 80vh;
+    gap: 15px;
+  }
+
+  .box-right {
+    padding: 15px;
+  }
+
+  .inter {
+    border-width: 5px;
+  }
+
+  #commandDiv {
+    height: 100vh;
+    width: 90vw;
+  }
+}
