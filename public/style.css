@@ -273,27 +273,28 @@ form#chatForm .send:disabled {
   inset: 0;
   background: var(--bg);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-
   z-index: 99999;
   cursor: pointer;
   pointer-events: auto;
+  overflow: hidden;
 }
-/* allow children to receive events */
+
 .intro-screen * {
   pointer-events: auto;
 }
 
 /* Desktop / landscape ticket sizing */
 .intro-img {
-  height: 100svh;
-  height: 100vh;
+  max-width: 100%;
+  max-height: 100%;
   width: auto;
-  max-width: none;
+  height: auto;
+  object-fit: contain;
   display: block;
 }
+
 /* Mobile / portrait ticket sizing */
 @media (orientation: portrait) {
   .intro-img {
